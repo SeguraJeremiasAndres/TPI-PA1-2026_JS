@@ -6,6 +6,7 @@ import java.util.UUID;
 import empleado.exception.CampoObligatorioException;
 import empleado.exception.LegajoInvalidoException;
 import java.util.regex.Pattern;
+import empleado.exception.FechaIngresoInvalidaException;
 public class Empleado {
 
     private final UUID id;
@@ -37,7 +38,7 @@ public class Empleado {
         validarObligatorio(puesto, "puesto");
         validarObligatorio(salario, "salario");
         validarFormatoLegajo(legajo);
-
+        validarFechaIngreso(fechaIngreso);
         return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
     }
@@ -51,6 +52,13 @@ public class Empleado {
         if (!FORMATO_LEGAJO.matcher(legajo).matches()) {
             throw new LegajoInvalidoException(
                     "El legajo debe tener 3 letras mayúsculas seguidas de 4 números (ej. ABC1234)");
+        }
+    }
+
+    private static void validarFechaIngreso(LocalDate fechaIngreso) {
+        if (fechaIngreso.isAfter(LocalDate.now())) {
+            throw new FechaIngresoInvalidaException(
+                    "La fechaIngreso no puede ser posterior a la fecha actual");
         }
     }
     public UUID getId() { return id; }

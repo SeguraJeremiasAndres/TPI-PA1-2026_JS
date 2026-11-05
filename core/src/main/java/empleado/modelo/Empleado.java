@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import empleado.exception.CampoObligatorioException;
+import empleado.exception.LegajoInvalidoException;
+import java.util.regex.Pattern;
 public class Empleado {
 
     private final UUID id;
@@ -12,6 +14,8 @@ public class Empleado {
     private final LocalDate fechaIngreso;
     private final Puesto puesto;
     private final BigDecimal salario;
+
+    private static final Pattern FORMATO_LEGAJO = Pattern.compile("[A-Z]{3}[0-9]{4}");
 
     private Empleado(UUID id, String nombreCompleto, String legajo,
                      LocalDate fechaIngreso, Puesto puesto, BigDecimal salario) {
@@ -32,6 +36,7 @@ public class Empleado {
         validarObligatorio(fechaIngreso, "fechaIngreso");
         validarObligatorio(puesto, "puesto");
         validarObligatorio(salario, "salario");
+        validarFormatoLegajo(legajo);
 
         return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
@@ -39,6 +44,13 @@ public class Empleado {
     private static void validarObligatorio(Object valor, String campo) {
         if (valor == null) {
             throw new CampoObligatorioException("El campo " + campo + " es obligatorio");
+        }
+    }
+
+    private static void validarFormatoLegajo(String legajo) {
+        if (!FORMATO_LEGAJO.matcher(legajo).matches()) {
+            throw new LegajoInvalidoException(
+                    "El legajo debe tener 3 letras mayúsculas seguidas de 4 números (ej. ABC1234)");
         }
     }
     public UUID getId() { return id; }

@@ -1,6 +1,7 @@
 package empleado.modelo;
 
 import empleado.exception.CampoObligatorioException;
+import empleado.exception.LegajoInvalidoException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -71,5 +72,49 @@ class EmpleadoTest {
                         Puesto.ANALISTA, null));
 
         assertTrue(ex.getMessage().contains("salario"));
+    }
+    @Test
+    void instance_conLegajoEnMinusculas_lanzaLegajoInvalidoException() {
+        LegajoInvalidoException ex = assertThrows(LegajoInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "abc1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
+
+    @Test
+    void instance_conLegajoConMenosDeCuatroNumeros_lanzaLegajoInvalidoException() {
+        LegajoInvalidoException ex = assertThrows(LegajoInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC123", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
+
+    @Test
+    void instance_conLegajoConMasDeCuatroNumeros_lanzaLegajoInvalidoException() {
+        LegajoInvalidoException ex = assertThrows(LegajoInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC12345", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
+
+    @Test
+    void instance_conLegajoConLetrasEnLugarDeNumeros_lanzaLegajoInvalidoException() {
+        LegajoInvalidoException ex = assertThrows(LegajoInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABCDEFG", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
+
+    @Test
+    void instance_conLegajoConNumerosAntesDeLasLetras_lanzaLegajoInvalidoException() {
+        LegajoInvalidoException ex = assertThrows(LegajoInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "1234ABC", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
     }
 }

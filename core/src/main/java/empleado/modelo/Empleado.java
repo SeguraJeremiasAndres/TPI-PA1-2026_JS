@@ -26,7 +26,7 @@ public class Empleado {
     public static Empleado instance(String nombreCompleto, String legajo,
                                     LocalDate fechaIngreso, Puesto puesto,
                                     BigDecimal salario) {
-        
+
         validarObligatorio(nombreCompleto, "nombreCompleto");
         validarObligatorio(legajo, "legajo");
         validarObligatorio(fechaIngreso, "fechaIngreso");

@@ -3,7 +3,7 @@ package empleado.modelo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-
+import empleado.exception.CampoObligatorioException;
 public class Empleado {
 
     private final UUID id;
@@ -26,10 +26,21 @@ public class Empleado {
     public static Empleado instance(String nombreCompleto, String legajo,
                                     LocalDate fechaIngreso, Puesto puesto,
                                     BigDecimal salario) {
+        
+        validarObligatorio(nombreCompleto, "nombreCompleto");
+        validarObligatorio(legajo, "legajo");
+        validarObligatorio(fechaIngreso, "fechaIngreso");
+        validarObligatorio(puesto, "puesto");
+        validarObligatorio(salario, "salario");
+
         return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
     }
-
+    private static void validarObligatorio(Object valor, String campo) {
+        if (valor == null) {
+            throw new CampoObligatorioException("El campo " + campo + " es obligatorio");
+        }
+    }
     public UUID getId() { return id; }
     public String getNombreCompleto() { return nombreCompleto; }
     public String getLegajo() { return legajo; }

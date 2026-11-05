@@ -7,6 +7,7 @@ import empleado.exception.CampoObligatorioException;
 import empleado.exception.LegajoInvalidoException;
 import java.util.regex.Pattern;
 import empleado.exception.FechaIngresoInvalidaException;
+import empleado.exception.SalarioInvalidoException;
 public class Empleado {
 
     private final UUID id;
@@ -39,6 +40,7 @@ public class Empleado {
         validarObligatorio(salario, "salario");
         validarFormatoLegajo(legajo);
         validarFechaIngreso(fechaIngreso);
+        validarSalario(salario, puesto);
         return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
     }
@@ -61,6 +63,17 @@ public class Empleado {
                     "La fechaIngreso no puede ser posterior a la fecha actual");
         }
     }
+
+    private static void validarSalario(BigDecimal salario, Puesto puesto) {
+        if (salario.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new SalarioInvalidoException("El salario debe ser mayor a cero");
+        }
+        if (salario.compareTo(puesto.getSalarioMinimo()) < 0) {
+            throw new SalarioInvalidoException(
+                    "El salario para " + puesto + " no puede ser menor a " + puesto.getSalarioMinimo());
+        }
+    }
+
     public UUID getId() { return id; }
     public String getNombreCompleto() { return nombreCompleto; }
     public String getLegajo() { return legajo; }

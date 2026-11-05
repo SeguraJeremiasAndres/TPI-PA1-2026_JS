@@ -1,6 +1,7 @@
 package empleado.modelo;
 
 import empleado.exception.CampoObligatorioException;
+import empleado.exception.FechaIngresoInvalidaException;
 import empleado.exception.LegajoInvalidoException;
 import org.junit.jupiter.api.Test;
 
@@ -116,5 +117,23 @@ class EmpleadoTest {
                         Puesto.ANALISTA, new BigDecimal("600000")));
 
         assertTrue(ex.getMessage().contains("legajo"));
+    }
+    @Test
+    void instance_conFechaIngresoPosteriorAHoy_lanzaFechaIngresoInvalidaException() {
+        FechaIngresoInvalidaException ex = assertThrows(FechaIngresoInvalidaException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.now().plusDays(1),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("fechaIngreso"));
+    }
+
+    @Test
+    void instance_conFechaIngresoDeHoy_creaEmpleado() {
+        LocalDate hoy = LocalDate.now();
+
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234", hoy,
+                Puesto.ANALISTA, new BigDecimal("600000"));
+
+        assertEquals(hoy, empleado.getFechaIngreso());
     }
 }

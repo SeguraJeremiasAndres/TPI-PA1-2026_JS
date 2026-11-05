@@ -3,6 +3,7 @@ package empleado.modelo;
 import empleado.exception.CampoObligatorioException;
 import empleado.exception.FechaIngresoInvalidaException;
 import empleado.exception.LegajoInvalidoException;
+import empleado.exception.SalarioInvalidoException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -135,5 +136,72 @@ class EmpleadoTest {
                 Puesto.ANALISTA, new BigDecimal("600000"));
 
         assertEquals(hoy, empleado.getFechaIngreso());
+    }
+    @Test
+    void instance_conSalarioCero_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, BigDecimal.ZERO));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conSalarioNegativo_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("-1")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conAnalistaPorDebajoDelPiso_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("499999.99")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conSupervisorPorDebajoDelPiso_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.SUPERVISOR, new BigDecimal("799999.99")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conGerentePorDebajoDelPiso_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.GERENTE, new BigDecimal("1199999.99")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+    @Test
+    void instance_conAnalistaEnElPiso_creaEmpleado() {
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                Puesto.ANALISTA, new BigDecimal("500000"));
+
+        assertEquals(new BigDecimal("500000"), empleado.getSalario());
+    }
+
+    @Test
+    void instance_conSupervisorEnElPiso_creaEmpleado() {
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                Puesto.SUPERVISOR, new BigDecimal("800000"));
+
+        assertEquals(new BigDecimal("800000"), empleado.getSalario());
+    }
+
+    @Test
+    void instance_conGerenteEnElPiso_creaEmpleado() {
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                Puesto.GERENTE, new BigDecimal("1200000"));
+
+        assertEquals(new BigDecimal("1200000"), empleado.getSalario());
     }
 }

@@ -14,6 +14,6 @@ public class ListarEmpleadosUseCase {
     }
 
     public List<Empleado> ejecutar() {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        return repository.listarTodos();
     }
 }

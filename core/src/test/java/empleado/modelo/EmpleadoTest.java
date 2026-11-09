@@ -223,4 +223,39 @@ class EmpleadoTest {
 
         assertTrue(ex.getMessage().contains("id"));
     }
+    @Test
+    void instance_conNombreCompletoVacio_lanzaCampoObligatorioException() {
+        CampoObligatorioException ex = assertThrows(CampoObligatorioException.class, () ->
+                Empleado.instance("", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("nombreCompleto"));
+    }
+
+    @Test
+    void instance_conNombreCompletoSoloEspacios_lanzaCampoObligatorioException() {
+        CampoObligatorioException ex = assertThrows(CampoObligatorioException.class, () ->
+                Empleado.instance("   ", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("nombreCompleto"));
+    }
+
+    @Test
+    void instance_conLegajoVacio_lanzaCampoObligatorioException() {
+        CampoObligatorioException ex = assertThrows(CampoObligatorioException.class, () ->
+                Empleado.instance("Juan Perez", "", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
+
+    @Test
+    void instance_conLegajoSoloEspacios_lanzaCampoObligatorioException() {
+        CampoObligatorioException ex = assertThrows(CampoObligatorioException.class, () ->
+                Empleado.instance("Juan Perez", "   ", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("legajo"));
+    }
 }

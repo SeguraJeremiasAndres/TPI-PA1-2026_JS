@@ -1,5 +1,5 @@
 package ar.edu.undec.adapter.data.empleado.repoimplementacion;
-
+import ar.edu.undec.adapter.data.empleado.mapper.EmpleadoEntityMapper;
 import ar.edu.undec.adapter.data.empleado.crud.EmpleadoCrudRepository;
 import empleado.modelo.Empleado;
 import empleado.output.EmpleadoRepository;
@@ -24,12 +24,13 @@ public class EmpleadoRepositoryImpl implements EmpleadoRepository {
 
     @Override
     public boolean guardar(Empleado empleado) {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        crud.save(EmpleadoEntityMapper.toEntity(empleado));
+        return true;
     }
 
     @Override
     public Optional<Empleado> buscarPorLegajo(String legajo) {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        return crud.findByLegajo(legajo).map(EmpleadoEntityMapper::toDomain);
     }
 
     @Override

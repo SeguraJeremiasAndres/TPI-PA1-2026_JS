@@ -8,6 +8,7 @@ import empleado.exception.LegajoInvalidoException;
 import java.util.regex.Pattern;
 import empleado.exception.FechaIngresoInvalidaException;
 import empleado.exception.SalarioInvalidoException;
+import empleado.exception.NombreInvalidoException;
 public class Empleado {
 
     private final UUID id;
@@ -18,6 +19,7 @@ public class Empleado {
     private final BigDecimal salario;
 
     private static final Pattern FORMATO_LEGAJO = Pattern.compile("[A-Z]{3}[0-9]{4}");
+    private static final int LONGITUD_MAXIMA_NOMBRE = 100;
 
     private Empleado(UUID id, String nombreCompleto, String legajo,
                      LocalDate fechaIngreso, Puesto puesto, BigDecimal salario) {
@@ -32,19 +34,9 @@ public class Empleado {
     public static Empleado instance(String nombreCompleto, String legajo,
                                     LocalDate fechaIngreso, Puesto puesto,
                                     BigDecimal salario) {
-
-        validarObligatorio(nombreCompleto, "nombreCompleto");
-        validarObligatorio(legajo, "legajo");
-        validarObligatorio(fechaIngreso, "fechaIngreso");
-        validarObligatorio(puesto, "puesto");
-        validarObligatorio(salario, "salario");
-        validarFormatoLegajo(legajo);
-        validarFechaIngreso(fechaIngreso);
-        validarSalario(salario, puesto);
-        return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
+        return instance(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
     }
-
     public static Empleado instance(UUID id, String nombreCompleto, String legajo,
                                     LocalDate fechaIngreso, Puesto puesto,
                                     BigDecimal salario) {
@@ -55,11 +47,19 @@ public class Empleado {
         validarObligatorio(puesto, "puesto");
         validarObligatorio(salario, "salario");
 
+        validarLongitudNombre(nombreCompleto);
         validarFormatoLegajo(legajo);
         validarFechaIngreso(fechaIngreso);
         validarSalario(salario, puesto);
 
         return new Empleado(id, nombreCompleto, legajo, fechaIngreso, puesto, salario);
+    }
+
+    private static void validarLongitudNombre(String nombreCompleto) {
+        if (nombreCompleto.length() > LONGITUD_MAXIMA_NOMBRE) {
+            throw new NombreInvalidoException(
+                    "El nombreCompleto no puede superar los " + LONGITUD_MAXIMA_NOMBRE + " caracteres");
+        }
     }
 
     private static void validarObligatorio(Object valor, String campo) {

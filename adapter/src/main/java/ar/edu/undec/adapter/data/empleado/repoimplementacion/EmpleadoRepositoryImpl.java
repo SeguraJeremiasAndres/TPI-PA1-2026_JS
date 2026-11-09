@@ -4,7 +4,7 @@ import ar.edu.undec.adapter.data.empleado.crud.EmpleadoCrudRepository;
 import empleado.modelo.Empleado;
 import empleado.output.EmpleadoRepository;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +24,12 @@ public class EmpleadoRepositoryImpl implements EmpleadoRepository {
 
     @Override
     public boolean guardar(Empleado empleado) {
-        crud.save(EmpleadoEntityMapper.toEntity(empleado));
-        return true;
+        try {
+            crud.saveAndFlush(EmpleadoEntityMapper.toEntity(empleado));
+            return true;
+        } catch (DataAccessException e) {
+            return false;
+        }
     }
 
     @Override

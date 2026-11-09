@@ -13,6 +13,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import empleado.usecase.BuscarEmpleadoPorLegajoUseCase;
+import empleado.usecase.ListarEmpleadosUseCase;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -48,6 +51,9 @@ class EmpleadoControllerTest {
 
     @MockBean
     private BuscarEmpleadoPorLegajoUseCase buscarEmpleadoPorLegajoUseCase;
+
+    @MockBean
+    private ListarEmpleadosUseCase listarEmpleadosUseCase;
 
     @Test
     void crear_conDatosValidos_respondeCreatedConElEmpleado() throws Exception {
@@ -101,6 +107,33 @@ class EmpleadoControllerTest {
                 .andExpect(jsonPath("$.fechaIngreso").value("2024-03-15"))
                 .andExpect(jsonPath("$.puesto").value("ANALISTA"))
                 .andExpect(jsonPath("$.salario").value(600000));
+    }
+    @Test
+    void listar_conEmpleadosRegistrados_respondeOkConTodos() throws Exception {
+        Empleado juan = empleadoValido();
+        Empleado maria = Empleado.instance("Maria Gomez", "XYZ5678",
+                LocalDate.of(2023, 8, 1), Puesto.SUPERVISOR, new BigDecimal("900000"));
+        when(listarEmpleadosUseCase.ejecutar()).thenReturn(List.of(juan, maria));
+
+        mockMvc.perform(get("/empleados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].legajo").value("ABC1234"))
+                .andExpect(jsonPath("$[0].puesto").value("ANALISTA"))
+                .andExpect(jsonPath("$[1].legajo").value("XYZ5678"))
+                .andExpect(jsonPath("$[1].nombreCompleto").value("Maria Gomez"))
+                .andExpect(jsonPath("$[1].puesto").value("SUPERVISOR"))
+                .andExpect(jsonPath("$[1].salario").value(900000));
+    }
+
+    @Test
+    void listar_sinEmpleados_respondeOkConListaVacia() throws Exception {
+        when(listarEmpleadosUseCase.ejecutar()).thenReturn(List.of());
+
+        mockMvc.perform(get("/empleados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
     private Empleado empleadoValido() {
         return Empleado.instance("Juan Perez", "ABC1234",

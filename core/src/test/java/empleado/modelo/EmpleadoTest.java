@@ -4,6 +4,7 @@ import empleado.exception.CampoObligatorioException;
 import empleado.exception.FechaIngresoInvalidaException;
 import empleado.exception.LegajoInvalidoException;
 import empleado.exception.SalarioInvalidoException;
+import empleado.exception.NombreInvalidoException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -257,5 +258,25 @@ class EmpleadoTest {
                         Puesto.ANALISTA, new BigDecimal("600000")));
 
         assertTrue(ex.getMessage().contains("legajo"));
+    }
+    @Test
+    void instance_conNombreCompletoDeMasDeCienCaracteres_lanzaNombreInvalidoException() {
+        String nombreLargo = "A".repeat(101);
+
+        NombreInvalidoException ex = assertThrows(NombreInvalidoException.class, () ->
+                Empleado.instance(nombreLargo, "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("nombreCompleto"));
+    }
+
+    @Test
+    void instance_conNombreCompletoDeCienCaracteres_creaEmpleado() {
+        String nombreEnElLimite = "A".repeat(100);
+
+        Empleado empleado = Empleado.instance(nombreEnElLimite, "ABC1234",
+                LocalDate.of(2024, 3, 15), Puesto.ANALISTA, new BigDecimal("600000"));
+
+        assertEquals(nombreEnElLimite, empleado.getNombreCompleto());
     }
 }

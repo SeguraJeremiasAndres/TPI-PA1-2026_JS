@@ -49,6 +49,9 @@ public class EmpleadoController {
 
     @GetMapping
     public ResponseEntity<List<EmpleadoResponse>> listar() {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        List<EmpleadoResponse> respuesta = listarEmpleadosUseCase.ejecutar().stream()
+                .map(EmpleadoRestMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(respuesta);
     }
 }

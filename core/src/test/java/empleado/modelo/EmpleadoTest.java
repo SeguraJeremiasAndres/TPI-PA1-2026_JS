@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -203,5 +204,23 @@ class EmpleadoTest {
                 Puesto.GERENTE, new BigDecimal("1200000"));
 
         assertEquals(new BigDecimal("1200000"), empleado.getSalario());
+    }
+    @Test
+    void instance_conIdExistente_conservaElId() {
+        UUID id = UUID.randomUUID();
+
+        Empleado empleado = Empleado.instance(id, "Juan Perez", "ABC1234",
+                LocalDate.of(2024, 3, 15), Puesto.ANALISTA, new BigDecimal("600000"));
+
+        assertEquals(id, empleado.getId());
+    }
+
+    @Test
+    void instance_conIdNulo_lanzaCampoObligatorioException() {
+        CampoObligatorioException ex = assertThrows(CampoObligatorioException.class, () ->
+                Empleado.instance(null, "Juan Perez", "ABC1234",
+                        LocalDate.of(2024, 3, 15), Puesto.ANALISTA, new BigDecimal("600000")));
+
+        assertTrue(ex.getMessage().contains("id"));
     }
 }

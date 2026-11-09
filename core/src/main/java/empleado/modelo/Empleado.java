@@ -44,6 +44,11 @@ public class Empleado {
         return new Empleado(UUID.randomUUID(), nombreCompleto, legajo,
                 fechaIngreso, puesto, salario);
     }
+    public static Empleado instance(UUID id, String nombreCompleto, String legajo,
+                                    LocalDate fechaIngreso, Puesto puesto,
+                                    BigDecimal salario) {
+        throw new UnsupportedOperationException("pendiente de implementar");
+    }
     private static void validarObligatorio(Object valor, String campo) {
         if (valor == null) {
             throw new CampoObligatorioException("El campo " + campo + " es obligatorio");

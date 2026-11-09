@@ -20,6 +20,8 @@ public class Empleado {
 
     private static final Pattern FORMATO_LEGAJO = Pattern.compile("[A-Z]{3}[0-9]{4}");
     private static final int LONGITUD_MAXIMA_NOMBRE = 100;
+    private static final BigDecimal SALARIO_MAXIMO = new BigDecimal("9999999999999.99");
+    private static final int DECIMALES_MAXIMOS = 2;
 
     private Empleado(UUID id, String nombreCompleto, String legajo,
                      LocalDate fechaIngreso, Puesto puesto, BigDecimal salario) {
@@ -85,6 +87,14 @@ public class Empleado {
     private static void validarSalario(BigDecimal salario, Puesto puesto) {
         if (salario.compareTo(BigDecimal.ZERO) <= 0) {
             throw new SalarioInvalidoException("El salario debe ser mayor a cero");
+        }
+        if (salario.stripTrailingZeros().scale() > DECIMALES_MAXIMOS) {
+            throw new SalarioInvalidoException(
+                    "El salario no puede tener mas de " + DECIMALES_MAXIMOS + " decimales");
+        }
+        if (salario.compareTo(SALARIO_MAXIMO) > 0) {
+            throw new SalarioInvalidoException(
+                    "El salario no puede superar " + SALARIO_MAXIMO);
         }
         if (salario.compareTo(puesto.getSalarioMinimo()) < 0) {
             throw new SalarioInvalidoException(

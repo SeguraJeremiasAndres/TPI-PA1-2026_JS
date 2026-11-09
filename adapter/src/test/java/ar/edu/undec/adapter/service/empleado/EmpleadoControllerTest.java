@@ -14,6 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import empleado.usecase.BuscarEmpleadoPorLegajoUseCase;
 import empleado.usecase.ListarEmpleadosUseCase;
+import empleado.exception.CampoObligatorioException;
+import empleado.exception.EmpleadoNoEncontradoException;
+import empleado.exception.FechaIngresoInvalidaException;
+import empleado.exception.LegajoDuplicadoException;
+import empleado.exception.LegajoInvalidoException;
+import empleado.exception.PersistenciaException;
+import empleado.exception.SalarioInvalidoException;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
@@ -134,6 +142,81 @@ class EmpleadoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+    @Test
+    void crear_conCampoObligatorioNulo_respondeBadRequestConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new CampoObligatorioException("El campo legajo es obligatorio"));
+
+        postCrear()
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value("El campo legajo es obligatorio"));
+    }
+
+    @Test
+    void crear_conLegajoInvalido_respondeBadRequestConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new LegajoInvalidoException("El legajo debe tener 3 letras mayusculas y 4 numeros"));
+
+        postCrear()
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value("El legajo debe tener 3 letras mayusculas y 4 numeros"));
+    }
+
+    @Test
+    void crear_conFechaIngresoInvalida_respondeBadRequestConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new FechaIngresoInvalidaException("La fechaIngreso no puede ser posterior a la fecha actual"));
+
+        postCrear()
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value("La fechaIngreso no puede ser posterior a la fecha actual"));
+    }
+
+    @Test
+    void crear_conSalarioInvalido_respondeBadRequestConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new SalarioInvalidoException("El salario debe ser mayor a cero"));
+
+        postCrear()
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value("El salario debe ser mayor a cero"));
+    }
+
+    @Test
+    void crear_conLegajoDuplicado_respondeConflictConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new LegajoDuplicadoException("Ya existe un empleado con el legajo ABC1234"));
+
+        postCrear()
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value("Ya existe un empleado con el legajo ABC1234"));
+    }
+
+    @Test
+    void crear_cuandoFallaLaPersistencia_respondeInternalServerErrorConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new PersistenciaException("No se pudo guardar el empleado"));
+
+        postCrear()
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.mensaje").value("No se pudo guardar el empleado"));
+    }
+
+    @Test
+    void buscar_conLegajoInexistente_respondeNotFoundConElMensaje() throws Exception {
+        when(buscarEmpleadoPorLegajoUseCase.ejecutar("ZZZ9999"))
+                .thenThrow(new EmpleadoNoEncontradoException("No se encontro un empleado con el legajo ZZZ9999"));
+
+        mockMvc.perform(get("/empleados/ZZZ9999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensaje").value("No se encontro un empleado con el legajo ZZZ9999"));
+    }
+
+    private ResultActions postCrear() throws Exception {
+        return mockMvc.perform(post("/empleados")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON_VALIDO));
     }
     private Empleado empleadoValido() {
         return Empleado.instance("Juan Perez", "ABC1234",

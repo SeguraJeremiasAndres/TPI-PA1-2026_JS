@@ -19,7 +19,7 @@ public class EmpleadoRepositoryImpl implements EmpleadoRepository {
 
     @Override
     public boolean existePorLegajo(String legajo) {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        return crud.existsByLegajo(legajo);
     }
 
     @Override
@@ -35,6 +35,8 @@ public class EmpleadoRepositoryImpl implements EmpleadoRepository {
 
     @Override
     public List<Empleado> listarTodos() {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        return crud.findAll().stream()
+                .map(EmpleadoEntityMapper::toDomain)
+                .toList();
     }
 }

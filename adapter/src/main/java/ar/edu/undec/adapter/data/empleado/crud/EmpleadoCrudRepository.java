@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface EmpleadoCrudRepository extends JpaRepository<EmpleadoEntity, UUID> {
 
     Optional<EmpleadoEntity> findByLegajo(String legajo);
+    boolean existsByLegajo(String legajo);
 }

@@ -23,6 +23,7 @@ import empleado.exception.PersistenciaException;
 import empleado.exception.SalarioInvalidoException;
 import empleado.exception.NombreInvalidoException;
 import org.springframework.test.web.servlet.ResultActions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 
@@ -221,6 +222,54 @@ class EmpleadoControllerTest {
         postCrear()
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.mensaje").value("El nombreCompleto no puede superar los 100 caracteres"));
+    }
+    @Test
+    void crear_conPuestoInexistente_respondeBadRequestConMensaje() throws Exception {
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                              "nombreCompleto": "Juan Perez",
+                              "legajo": "ABC1234",
+                              "fechaIngreso": "2024-03-15",
+                              "puesto": "DIRECTOR",
+                              "salario": 600000
+                            }
+                            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verifyNoInteractions(crearEmpleadoUseCase);
+    }
+
+    @Test
+    void crear_conJsonMalFormado_respondeBadRequestConMensaje() throws Exception {
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"nombreCompleto\": \"Juan Perez\", "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verifyNoInteractions(crearEmpleadoUseCase);
+    }
+
+    @Test
+    void crear_conFechaConFormatoInvalido_respondeBadRequestConMensaje() throws Exception {
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                              "nombreCompleto": "Juan Perez",
+                              "legajo": "ABC1234",
+                              "fechaIngreso": "15/03/2024",
+                              "puesto": "ANALISTA",
+                              "salario": 600000
+                            }
+                            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verifyNoInteractions(crearEmpleadoUseCase);
     }
 
     private ResultActions postCrear() throws Exception {

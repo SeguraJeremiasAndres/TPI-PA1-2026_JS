@@ -279,4 +279,37 @@ class EmpleadoTest {
 
         assertEquals(nombreEnElLimite, empleado.getNombreCompleto());
     }
+    @Test
+    void instance_conSalarioConMasDeDosDecimales_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.GERENTE, new BigDecimal("1200000.001")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conSalarioPorEncimaDelTope_lanzaSalarioInvalidoException() {
+        SalarioInvalidoException ex = assertThrows(SalarioInvalidoException.class, () ->
+                Empleado.instance("Juan Perez", "ABC1234", LocalDate.of(2024, 3, 15),
+                        Puesto.GERENTE, new BigDecimal("10000000000000")));
+
+        assertTrue(ex.getMessage().contains("salario"));
+    }
+
+    @Test
+    void instance_conSalarioEnElTope_creaEmpleado() {
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234",
+                LocalDate.of(2024, 3, 15), Puesto.GERENTE, new BigDecimal("9999999999999.99"));
+
+        assertEquals(0, new BigDecimal("9999999999999.99").compareTo(empleado.getSalario()));
+    }
+
+    @Test
+    void instance_conSalarioConCerosSobrantes_creaEmpleado() {
+        Empleado empleado = Empleado.instance("Juan Perez", "ABC1234",
+                LocalDate.of(2024, 3, 15), Puesto.GERENTE, new BigDecimal("1200000.500"));
+
+        assertEquals(0, new BigDecimal("1200000.5").compareTo(empleado.getSalario()));
+    }
 }

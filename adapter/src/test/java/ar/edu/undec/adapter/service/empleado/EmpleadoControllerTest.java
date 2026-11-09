@@ -12,6 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import empleado.usecase.BuscarEmpleadoPorLegajoUseCase;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,6 +45,9 @@ class EmpleadoControllerTest {
 
     @MockBean
     private CrearEmpleadoUseCase crearEmpleadoUseCase;
+
+    @MockBean
+    private BuscarEmpleadoPorLegajoUseCase buscarEmpleadoPorLegajoUseCase;
 
     @Test
     void crear_conDatosValidos_respondeCreatedConElEmpleado() throws Exception {
@@ -82,6 +88,20 @@ class EmpleadoControllerTest {
         assertEquals(0, new BigDecimal("600000").compareTo(command.salario()));
     }
 
+    @Test
+    void buscar_conLegajoExistente_respondeOkConElEmpleado() throws Exception {
+        Empleado empleado = empleadoValido();
+        when(buscarEmpleadoPorLegajoUseCase.ejecutar("ABC1234")).thenReturn(empleado);
+
+        mockMvc.perform(get("/empleados/ABC1234"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(empleado.getId().toString()))
+                .andExpect(jsonPath("$.nombreCompleto").value("Juan Perez"))
+                .andExpect(jsonPath("$.legajo").value("ABC1234"))
+                .andExpect(jsonPath("$.fechaIngreso").value("2024-03-15"))
+                .andExpect(jsonPath("$.puesto").value("ANALISTA"))
+                .andExpect(jsonPath("$.salario").value(600000));
+    }
     private Empleado empleadoValido() {
         return Empleado.instance("Juan Perez", "ABC1234",
                 LocalDate.of(2024, 3, 15), Puesto.ANALISTA, new BigDecimal("600000"));

@@ -63,7 +63,7 @@ public class Empleado {
     }
 
     private static void validarObligatorio(Object valor, String campo) {
-        if (valor == null) {
+        if (valor == null || (valor instanceof String texto && texto.isBlank())) {
             throw new CampoObligatorioException("El campo " + campo + " es obligatorio");
         }
     }

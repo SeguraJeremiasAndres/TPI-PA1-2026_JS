@@ -21,6 +21,7 @@ import empleado.exception.LegajoDuplicadoException;
 import empleado.exception.LegajoInvalidoException;
 import empleado.exception.PersistenciaException;
 import empleado.exception.SalarioInvalidoException;
+import empleado.exception.NombreInvalidoException;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -211,6 +212,15 @@ class EmpleadoControllerTest {
         mockMvc.perform(get("/empleados/ZZZ9999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.mensaje").value("No se encontro un empleado con el legajo ZZZ9999"));
+    }
+    @Test
+    void crear_conNombreInvalido_respondeBadRequestConElMensaje() throws Exception {
+        when(crearEmpleadoUseCase.ejecutar(any(CrearEmpleadoCommand.class)))
+                .thenThrow(new NombreInvalidoException("El nombreCompleto no puede superar los 100 caracteres"));
+
+        postCrear()
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value("El nombreCompleto no puede superar los 100 caracteres"));
     }
 
     private ResultActions postCrear() throws Exception {

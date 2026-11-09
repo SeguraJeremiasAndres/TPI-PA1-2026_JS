@@ -108,4 +108,14 @@ class EmpleadoRepositoryImplTest {
 
         assertTrue(resultado.isEmpty());
     }
+    @Test
+    void guardar_conLegajoDuplicado_retornaFalse() {
+        repository.guardar(empleadoValido());
+        Empleado otroConMismoLegajo = Empleado.instance("Pedro Lopez", "ABC1234",
+                LocalDate.of(2022, 5, 10), Puesto.GERENTE, new BigDecimal("1500000"));
+
+        boolean guardado = repository.guardar(otroConMismoLegajo);
+
+        assertFalse(guardado);
+    }
 }

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import ar.edu.undec.adapter.service.empleado.mapper.EmpleadoRestMapper;
+import empleado.modelo.Empleado;
+import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/empleados")
 public class EmpleadoController {
@@ -21,6 +23,8 @@ public class EmpleadoController {
 
     @PostMapping
     public ResponseEntity<EmpleadoResponse> crear(@RequestBody CrearEmpleadoRequest request) {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        Empleado empleado = crearEmpleadoUseCase.ejecutar(EmpleadoRestMapper.toCommand(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(EmpleadoRestMapper.toResponse(empleado));
     }
 }

@@ -37,6 +37,7 @@ public class EmpleadoController {
 
     @GetMapping("/{legajo}")
     public ResponseEntity<EmpleadoResponse> buscar(@PathVariable("legajo") String legajo) {
-        throw new UnsupportedOperationException("pendiente de implementar");
+        Empleado empleado = buscarEmpleadoPorLegajoUseCase.ejecutar(legajo);
+        return ResponseEntity.ok(EmpleadoRestMapper.toResponse(empleado));
     }
 }
